@@ -21,4 +21,9 @@
 >  ## ranking:
 >  - teremos tambem um algoritmo de caminho mais otimizado, a fim de avaliar o trabalho do jogador com uma media ponderada, dizendo o quao perto ele ficou da melhor ferrovia possivel (0-10).
 
-# em andamento...
+>  ## funcoes:
+> - Arthur: matriz, base do jogo
+> - Ryan: interface 
+> - Eduardo: grafos
+> - Fernando: algoritmo
+> - Teones: geração de mapa
