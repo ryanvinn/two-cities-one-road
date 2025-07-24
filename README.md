@@ -27,3 +27,6 @@
 > - Eduardo: grafos
 > - Fernando: algoritmo
 > - Teones: geração de mapa
+
+## bibliotecas necessárias:
+- matrix
