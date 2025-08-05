@@ -3,19 +3,56 @@ module Main where
 import Data.List (intercalate) -- Para intercalar dados na formatação
 import System.Console.Haskeline -- Para capturar comandos de teclado
 
-column_length :: Int
-column_length = 15
-
-line_length :: Int
-line_length = 55
-
 -- | Função principal do programa
 main :: IO()
-main = putStr ""
+main = runHomeScreen
 
--- Retorna em Char a tecla pressionada
-getKey :: IO Char
-getKey = runInputT defaultSettings getInputChar
+-- Executa a tela inicial
+runHomeScreen :: IO()
+runHomeScreen = do
+  clearScreen
+  putStr homeScreen
+  key <- getKey
+  case key of
+    'a' -> runHomeScreen -- TODO
+    's' -> runMapSelectionScreen
+    'g' -> runHomeScreen -- TODO
+    'q' -> return ()
+    _ -> runHomeScreen
+
+-- Executa a tela de seleção de mapas
+runMapSelectionScreen :: IO()
+runMapSelectionScreen = do
+  clearScreen
+  putStr mapSelectionScreen
+  key <- getKey
+  case key of
+    '0' -> runMapVisualizationScreen 0 -- TODO
+    -- TODO
+    'q' -> runHomeScreen
+    _ -> runMapSelectionScreen
+
+-- | Executa tela de visualização de mapa
+runMapVisualizationScreen :: Int -> IO ()
+runMapVisualizationScreen mapNumber = do
+  clearScreen
+  putStr (mapVisualizationScreen mapNumber)
+  key <- getKey
+  case key of
+    'j' -> runGameScreen mapNumber
+    'q' -> runMapSelectionScreen
+    _ -> runMapVisualizationScreen mapNumber
+
+-- | Executa tela de jogo
+runGameScreen :: Int -> IO ()
+runGameScreen mapNumber = do
+  clearScreen
+  putStr (gameScreen mapNumber)
+  key <- getKey
+  case key of
+    -- TODO
+    'q' -> runHomeScreen
+    _ -> runGameScreen mapNumber
 
 -- | Retorna uma String representativa da tela inicial
 homeScreen :: String
@@ -27,10 +64,10 @@ homeScreen = baseScreen
     "Seu objetivo é conectar duas cidades com recursos",
     "limitados e diversos obstáculos e materiais.",
     "",
-    "(A)cessar o último mapa jogado",
-    "(S)elecionar mapas",
-    "(G)erar e acessar um novo mapa",
-    "(E)ncerrar jogo"
+    "(A) Acessar o último mapa jogado",
+    "(S) Selecionar mapas",
+    "(G) Gerar e acessar um novo mapa",
+    "(Q) Encerrar jogo"
   ])
   (middleJustifyLine "<Aperte a tecla correspondente à uma das opções>")
 
@@ -42,15 +79,15 @@ mapSelectionScreen = baseScreen
   (middleJustifyLine "<0-9> para abrir mapa <Q> para voltar à tela anterior")
 
 -- |  Retorna uma String representativa da tela de visualização de mapa
-mapVisualizationScreen :: String
-mapVisualizationScreen = baseScreen
+mapVisualizationScreen :: Int -> String
+mapVisualizationScreen map_number = baseScreen
   (emptyLine) -- TODO exibir recursos, tal qual na tela de jogo
   (emptyMiddle) -- TODO exibir estado do mapa
   (middleJustifyLine "<J> para jogar mapa <Q> para voltar à tela anterior")
 
 -- | Retorna uma String representativa da tela de jogo
-gameScreen :: String
-gameScreen = baseScreen
+gameScreen :: Int -> String
+gameScreen map_number = baseScreen
   (emptyLine) -- TODO
   (emptyMiddle) -- TODO
   (emptyLine) -- TODO
@@ -67,6 +104,18 @@ baseScreen top middle down = unlines [
     ("│" ++ down ++ "│"),
     ("╰" ++ simpleLine ++ "╯")
   ]
+
+-- | Limpa a tela
+clearScreen :: IO ()
+clearScreen = putStr "\ESC[2J\ESC[H"
+
+-- Retorna em Char a tecla pressionada
+getKey :: IO Char
+getKey = do
+  result <- runInputT defaultSettings (getInputChar "")
+  case result of
+    Just c -> return c
+    Nothing -> return '\0'
 
 -- | Retorna um linha de 55 caracteres '─'
 simpleLine :: String
@@ -118,3 +167,11 @@ topJustifyColumn strs = left_justified_lines ++ after
 -- | Justifica o conteúdo de uma linha à esquerda
 leftJustifyLine :: String -> String
 leftJustifyLine str = str ++ replicate (line_length - length str) ' '
+
+-- | Retorna o tamanho de uma coluna
+column_length :: Int
+column_length = 15
+
+-- | Retorna o tamanho de uma linha
+line_length :: Int
+line_length = 55
