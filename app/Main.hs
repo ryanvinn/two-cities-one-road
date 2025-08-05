@@ -72,6 +72,7 @@ homeScreen = baseScreen
   (middleJustifyLine "<Aperte a tecla correspondente à uma das opções>")
 
 -- | Retorna uma String representativa da tela de seleção de mapas
+-- Para tanto, busca na memória os 10 últimos mapas com jogos não finalizados
 mapSelectionScreen :: String
 mapSelectionScreen = baseScreen
   (middleJustifyLine "Seleção de mapas")
@@ -79,6 +80,8 @@ mapSelectionScreen = baseScreen
   (middleJustifyLine "<0-9> para abrir mapa <Q> para voltar à tela anterior")
 
 -- |  Retorna uma String representativa da tela de visualização de mapa
+-- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
+-- (com os valores da matriz 5x11 e os valores dos recursos)
 mapVisualizationScreen :: Int -> String
 mapVisualizationScreen map_number = baseScreen
   (emptyLine) -- TODO exibir recursos, tal qual na tela de jogo
@@ -86,6 +89,8 @@ mapVisualizationScreen map_number = baseScreen
   (middleJustifyLine "<J> para jogar mapa <Q> para voltar à tela anterior")
 
 -- | Retorna uma String representativa da tela de jogo
+-- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
+-- (com os valores da matriz 5x11 e os valores dos recursos)
 gameScreen :: Int -> String
 gameScreen map_number = baseScreen
   (emptyLine) -- TODO
