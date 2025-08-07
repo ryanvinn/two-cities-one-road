@@ -3,6 +3,8 @@ module Main where
 import Data.List (intercalate) -- Para intercalar dados na formatação
 import System.Console.Haskeline -- Para capturar comandos de teclado
 
+import Map
+
 -- | Função principal do programa
 main :: IO()
 main = runHomeScreen
@@ -14,9 +16,9 @@ runHomeScreen = do
   putStr homeScreen
   key <- getKey
   case key of
-    'a' -> runHomeScreen -- TODO
+    'a' -> runGameScreen last_map
     's' -> runMapSelectionScreen
-    'g' -> runHomeScreen -- TODO
+    'g' -> runGameScreen generateRandomMap
     'q' -> return ()
     _ -> runHomeScreen
 
@@ -27,8 +29,7 @@ runMapSelectionScreen = do
   putStr mapSelectionScreen
   key <- getKey
   case key of
-    '0' -> runMapVisualizationScreen 0 -- TODO
-    -- TODO
+    c | elem c ['0'..'9'] -> runMapVisualizationScreen (read [c] :: Int)
     'q' -> runHomeScreen
     _ -> runMapSelectionScreen
 
@@ -50,7 +51,6 @@ runGameScreen mapNumber = do
   putStr (gameScreen mapNumber)
   key <- getKey
   case key of
-    -- TODO
     'q' -> runHomeScreen
     _ -> runGameScreen mapNumber
 
@@ -76,7 +76,7 @@ homeScreen = baseScreen
 mapSelectionScreen :: String
 mapSelectionScreen = baseScreen
   (middleJustifyLine "Seleção de mapas")
-  (emptyMiddle) -- TODO exibir 10 mapas (duas linhas por mapa)
+  (topJustifyColumn getSavedMapsInfos)
   (middleJustifyLine "<0-9> para abrir mapa <Q> para voltar à tela anterior")
 
 -- |  Retorna uma String representativa da tela de visualização de mapa
@@ -84,8 +84,8 @@ mapSelectionScreen = baseScreen
 -- (com os valores da matriz 5x11 e os valores dos recursos)
 mapVisualizationScreen :: Int -> String
 mapVisualizationScreen map_number = baseScreen
-  (emptyLine) -- TODO exibir recursos, tal qual na tela de jogo
-  (emptyMiddle) -- TODO exibir estado do mapa
+  (leftJustifyLine (getGameHeader map_number))
+  (middleJustifyColumn (getGameMatrix map_number))
   (middleJustifyLine "<J> para jogar mapa <Q> para voltar à tela anterior")
 
 -- | Retorna uma String representativa da tela de jogo
@@ -93,9 +93,9 @@ mapVisualizationScreen map_number = baseScreen
 -- (com os valores da matriz 5x11 e os valores dos recursos)
 gameScreen :: Int -> String
 gameScreen map_number = baseScreen
-  (emptyLine) -- TODO
-  (emptyMiddle) -- TODO
-  (emptyLine) -- TODO
+  (leftJustifyLine (getGameHeader map_number))
+  (middleJustifyColumn (getGameMatrix map_number))
+  (emptyLine) -- TODO exibir comandos possíveis
 
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
 -- formatada
@@ -180,3 +180,7 @@ column_length = 15
 -- | Retorna o tamanho de uma linha
 line_length :: Int
 line_length = 55
+
+-- | Retorna a numeração do último mapa jogado (per definição, posição 0)
+last_map :: Int
+last_map = 0

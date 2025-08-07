@@ -80,7 +80,7 @@ executable two-cities-one-road
                       haskeline >=0.8.2 && <0.9
 
     -- Directories containing source files.
-    hs-source-dirs:   app
+    hs-source-dirs:   app, src
 
     -- Base language which the package is written in.
     default-language: Haskell2010
