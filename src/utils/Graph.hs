@@ -1,4 +1,4 @@
-module Graph where
+module Utils.Graph where
 
 -- importa coisas necessarias de types e game
 import Types (Cords, Map, Tile(..))
