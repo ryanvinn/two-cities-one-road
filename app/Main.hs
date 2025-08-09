@@ -4,10 +4,13 @@ import Data.List (intercalate) -- Para intercalar dados na formatação
 import System.Console.Haskeline -- Para capturar comandos de teclado
 
 import Map
+import Persistence
 
 -- | Função principal do programa
 main :: IO()
-main = runHomeScreen
+main = do
+  verifyAndCreateFiles
+  runHomeScreen
 
 -- Executa a tela inicial
 runHomeScreen :: IO()
@@ -183,4 +186,4 @@ line_length = 55
 
 -- | Retorna a numeração do último mapa jogado (per definição, posição 0)
 last_map :: Int
-last_map = 0
+last_map = 0 -- TODO corrigir para buscar do arquivo
