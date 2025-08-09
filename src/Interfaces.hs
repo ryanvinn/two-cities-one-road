@@ -10,8 +10,11 @@ homeScreen = baseScreen
   (topJustifyColumn [
     "Bem vindo ao jogo!",
     "",
-    "Seu objetivo é conectar duas cidades com recursos",
-    "limitados e diversos obstáculos e materiais."
+    "Seu objetivo é conectar duas cidades com dinheiro",
+    "limitado e diversos obstáculos naturais.",
+    "",
+    "Durante o jogo, use as teclas de direção (w, a, s, d)",
+    "para construir trilhos nos quadrantes vizinhos ao seu."
   ])
   (middleJustifyLine "A: acessar último mapa, G: gerar mapa, Q: sair")
 
