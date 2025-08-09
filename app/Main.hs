@@ -19,43 +19,22 @@ runHomeScreen = do
   putStr homeScreen
   key <- getKey
   case key of
-    'a' -> runGameScreen last_map
-    's' -> runMapSelectionScreen
-    'g' -> runGameScreen generateRandomMap
+    'a' -> runGameScreen
+    'g' -> do
+      generateRandomMap
+      runGameScreen
     'q' -> return ()
     _ -> runHomeScreen
 
--- Executa a tela de seleção de mapas
-runMapSelectionScreen :: IO()
-runMapSelectionScreen = do
-  clearScreen
-  putStr mapSelectionScreen
-  key <- getKey
-  case key of
-    c | elem c ['0'..'9'] -> runMapVisualizationScreen (read [c] :: Int)
-    'q' -> runHomeScreen
-    _ -> runMapSelectionScreen
-
--- | Executa tela de visualização de mapa
-runMapVisualizationScreen :: Int -> IO ()
-runMapVisualizationScreen mapNumber = do
-  clearScreen
-  putStr (mapVisualizationScreen mapNumber)
-  key <- getKey
-  case key of
-    'j' -> runGameScreen mapNumber
-    'q' -> runMapSelectionScreen
-    _ -> runMapVisualizationScreen mapNumber
-
 -- | Executa tela de jogo
-runGameScreen :: Int -> IO ()
-runGameScreen mapNumber = do
+runGameScreen :: IO ()
+runGameScreen = do
   clearScreen
-  putStr (gameScreen mapNumber)
+  putStr gameScreen
   key <- getKey
   case key of
     'q' -> runHomeScreen
-    _ -> runGameScreen mapNumber
+    _ -> runGameScreen
 
 -- | Retorna uma String representativa da tela inicial
 homeScreen :: String
@@ -67,37 +46,19 @@ homeScreen = baseScreen
     "Seu objetivo é conectar duas cidades com recursos",
     "limitados e diversos obstáculos e materiais.",
     "",
-    "(A) Acessar o último mapa jogado",
-    "(S) Selecionar mapas",
-    "(G) Gerar e acessar um novo mapa",
-    "(Q) Encerrar jogo"
+    "(A) Acessar último mapa",
+    "(G) Gerar novo mapa",
+    "(Q) Encerrar programa"
   ])
   (middleJustifyLine "<Aperte a tecla correspondente à uma das opções>")
-
--- | Retorna uma String representativa da tela de seleção de mapas
--- Para tanto, busca na memória os 10 últimos mapas com jogos não finalizados
-mapSelectionScreen :: String
-mapSelectionScreen = baseScreen
-  (middleJustifyLine "Seleção de mapas")
-  (topJustifyColumn getSavedMapsInfos)
-  (middleJustifyLine "<0-9> para abrir mapa <Q> para voltar à tela anterior")
-
--- |  Retorna uma String representativa da tela de visualização de mapa
--- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
--- (com os valores da matriz 5x11 e os valores dos recursos)
-mapVisualizationScreen :: Int -> String
-mapVisualizationScreen map_number = baseScreen
-  (leftJustifyLine (getGameHeader map_number))
-  (middleJustifyColumn (getGameMatrix map_number))
-  (middleJustifyLine "<J> para jogar mapa <Q> para voltar à tela anterior")
 
 -- | Retorna uma String representativa da tela de jogo
 -- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
 -- (com os valores da matriz 5x11 e os valores dos recursos)
-gameScreen :: Int -> String
-gameScreen map_number = baseScreen
-  (leftJustifyLine (getGameHeader map_number))
-  (middleJustifyColumn (getGameMatrix map_number))
+gameScreen :: String
+gameScreen = baseScreen
+  (leftJustifyLine getGameHeader)
+  (middleJustifyColumn getGameMatrix)
   (emptyLine) -- TODO exibir comandos possíveis
 
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
@@ -183,7 +144,3 @@ column_length = 15
 -- | Retorna o tamanho de uma linha
 line_length :: Int
 line_length = 55
-
--- | Retorna a numeração do último mapa jogado (per definição, posição 0)
-last_map :: Int
-last_map = 0 -- TODO corrigir para buscar do arquivo

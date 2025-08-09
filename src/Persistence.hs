@@ -1,8 +1,9 @@
 module Persistence where
 
 import System.Directory (doesFileExist, createDirectoryIfMissing)
-import System.IO (writeFile, readFile)
+import System.IO
 import Control.Monad (unless)
+import Control.Exception
 
 -- | Verifica e cria os arquivos do programa
 verifyAndCreateFiles :: IO ()
@@ -12,28 +13,41 @@ verifyAndCreateFiles = do
   exists1 <- doesFileExist file1
   exists2 <- doesFileExist file2
 
-  unless exists1 (writeFile file1 "0")
-  unless exists2 (writeFile file2 (unlines [
-    "CPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPC",
-    "TODO",
-    "TODO",
-    "TODO",
-    "TODO",
-    "TODO",
-    "TODO",
-    "TODO",
-    "TODO",
-    "TODO"
-    ]))
+  unless exists1 (writeFile file1 default_matrix)
+  unless exists2 (writeFile file2 default_header)
 
   where
-    file1 = "data/next_map.txt"
-    file2 = "data/maps.txt"
+    file1 = "data/matrix.txt"
+    file2 = "data/header.txt"
 
 -- | Salva uma String em um arquivo
 writeString :: FilePath -> String -> IO ()
-writeString path content = writeFile path content
+writeString path content =
+  withFile path WriteMode $ \handle -> do
+    hPutStr handle content
+    hFlush handle
+
+-- | Salva um Int em um arquivo
+writeInt :: FilePath -> Int -> IO ()
+writeInt path content = writeString path (show content)
 
 -- | Lê uma String de um arquivo
 readString :: FilePath -> IO String
-readString path = readFile path
+readString path =
+  withFile path ReadMode $ \handle -> do
+    content <- hGetContents handle
+    length content `seq` return content
+
+-- | Lê um Int de um arquivo
+readInt :: FilePath -> IO Int
+readInt path = do
+  content <- readString path
+  return (read content)
+
+-- | Valor padrão da matriz de um mapa
+default_matrix :: String
+default_matrix = "CPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPC"
+
+-- | Valor padrão do cabeçalho de um mapa
+default_header :: String
+default_header = "100"
