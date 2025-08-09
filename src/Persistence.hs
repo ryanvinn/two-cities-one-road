@@ -46,7 +46,7 @@ readInt path = do
 
 -- | Valor padrão da matriz de um mapa
 default_matrix :: String
-default_matrix = "CPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPC"
+default_matrix = "CPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPc"
 
 -- | Valor padrão do cabeçalho de um mapa
 default_header :: String

@@ -25,7 +25,7 @@ getGameMatrix = fmap sliceString (readString matrix_loc)
 getRandomMatrix :: IO String
 getRandomMatrix = do
   middle <- sequence (replicate (lin*col - 2) (randomChar alphabet))
-  return ("C" ++ middle ++ "C")
+  return ("C" ++ middle ++ "c")
   where
     randomChar chars = do
       i <- randomRIO (0, length chars - 1)
@@ -42,7 +42,7 @@ sliceString s = [take 11 (drop (i * 11) s) | i <- [0..4]]
 
 -- Alfabeto de porcentagens
 alphabet :: String
-alphabet = "pppPmMl"
+alphabet = "ppppPmmffl"
 
 -- | Localização do cabeçalho do mapa na memória
 header_loc :: String

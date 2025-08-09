@@ -1,6 +1,6 @@
 module Interfaces where
 
-import Data.List (intercalate) -- Para intercalar dados na formatação
+import Data.List (intercalate, transpose) -- Para intercalar dados na formatação
 import Map (getGameHeader, getGameMatrix)
 
 -- | Retorna uma String representativa da tela inicial
@@ -49,7 +49,10 @@ expandMatrix :: [String] -> [String]
 expandMatrix = concatMap expandLine
   where
     expandLine :: String -> [String]
-    expandLine line = replicate 3 (concatMap (replicate 5) line)
+    expandLine line =
+      let charGrids = map grids line
+          gridLines = transpose charGrids
+      in map concat gridLines
 
 -- | Retorna um linha de 55 caracteres '─'
 simpleLine :: String
@@ -109,3 +112,39 @@ column_length = 15
 -- | Retorna o tamanho de uma linha
 line_length :: Int
 line_length = 55
+
+-- | Mapeia o padrão de caracteres de cada elemento
+grids :: Char -> [String]
+grids 'p' = [".,..,",
+             ",,..,",
+             ".,..."]
+grids 'P' = [".,..,",
+             "═════",
+             ".,..."]
+grids 'm' = ["..^.^",
+             "^^.^^",
+             ".^.^."]
+grids 'M' = ["..^.^",
+             "═════",
+             ".^.^."]
+grids 'l' = [".◡♣◡,",
+             "◡◡◡◡,",
+             "◡◡.♣"]
+grids 'L' = [".◡♣◡,",
+             "═════",
+             "◡◡.♣"]
+grids 'f' = ["♣,♣♣,",
+             "♣.♣♣♣",
+             ".♣♣,♣"]
+grids 'F' = ["♣,♣♣,",
+             "═════",
+             ".♣♣,♣"]
+grids 'c' = ["☵,♣☵,",
+             ",☵☵☵.",
+             ".☵♣,☵"]
+grids 'C' = ["☵♣☵☵,",
+             "☵☵═══",
+             "☵☵♣,☵"]
+grids _   = ["SOCOR",
+             "RO.SO",
+             "CORRO"]
