@@ -1,6 +1,6 @@
 module Utils.MapUtils where
 
-import Types
+import Utils.Types
 
 -- pega um tile a partir das coordenadas
 getElement :: Cords -> Map -> Tile
