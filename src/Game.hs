@@ -1,13 +1,10 @@
 module Game where
 
--- definicao de tipos compostos e `alias` para facilitar legibilidade
-data Terrain = Plains | River | Mountain deriving (Eq, Show)
-type Cords = (Int, Int)
-data Tile = Tile { terrain :: Terrain, buildingCost :: Int, passingCost :: Int, location :: Cords, built :: Bool} deriving (Eq, Show)
--- funcoes seletoras: <atributo> <tipo>
-type Map = [[Tile]]
+import Utils.Types
+import Utils.Graph
+import Utils.MapUtils
 
--- TODO: melhorar geracao de mapa (noise?)
+-- gera o mapa do jogo
 createMap :: Cords -> (Int, Int) -> Map
 createMap (maxLat, maxLong) (startLat, endLat) =
   let baseMap = [[tile lat long | long <- [0..maxLong-1]] | lat <- [0..maxLat-1]]
@@ -19,11 +16,6 @@ createMap (maxLat, maxLong) (startLat, endLat) =
       | odd lat && even long = Tile Mountain 3 2 (lat, long) False
       | mod long 3 == 0 = Tile River 2 2 (lat, long) False
       | otherwise = Tile Plains 1 1 (lat, long) False
-
-verifyCord :: Cords -> Map -> Bool
-verifyCord (lat, long) mp =
-  lat >= 0 && lat < length mp &&
-  long >= 0 && long < length (head mp)
 
 -- processa informacoes do painel para exibir na tela
 printTile :: Tile -> [Cords] -> Char
@@ -41,13 +33,6 @@ printMap [] _ = print "##########"
 printMap (col:cols) available = do
   putStrLn (map (\tile -> printTile tile available) col)
   printMap cols available
-
-getElement :: Cords -> Map -> Tile
-getElement (lat, long) mp = mp !! lat !! long
-
--- retorna uma lista com as coordenadas dos 4 vizinhos de um tile 
-findNeighbors :: Cords -> Map -> [Cords]
-findNeighbors (lat, long) mp = [(lat -1, long), (lat +1, long), (lat, long -1), (lat, long +1)]
 
 -- funcao build retorna o mesmo tile, so que com atributo de construido
 buildTile :: Cords -> Map -> Tile
@@ -92,15 +77,53 @@ readPlayer input =
       _-> Nothing
     _-> Nothing
 
+getNodes :: Map -> [Cords]
+getNodes mp = map location (concat mp)
+
+-- funcoes de IO().
+-- funcao que avalia o custo do trajeto do jogador
+evaluatePath :: [Cords] -> Map -> Cords -> Cords -> IO()
+evaluatePath playerPath mp start end = do
+  let startCost = passingCost (getElement start mp)
+  let endCost = passingCost (getElement end mp)
+  let playerCost = sum (map (\cords -> passingCost (getElement cords mp)) playerPath) - startCost
+
+  let nodes = getNodes mp
+  let graph = buildGraph mp
+
+  case bellmanFord nodes graph start of
+    Left err -> putStrLn ("Erro ao computar caminho: " ++ err)
+    Right (distances, preds) -> case lookup end distances of
+
+      Nothing -> putStrLn "Erro: Destino inalcançável"
+      
+      Just optimalCost -> do
+        let bestPath = buildPath start end preds
+        putStrLn ("Sua ferrovia passa por: " ++ show playerPath)
+        putStrLn ("Seus custos: " ++ show playerCost)
+        putStrLn ("Ferrovia ideal (Bellman-Ford): " ++ show bestPath)
+        putStrLn ("Custo ideal (Bellman-Ford): " ++ show optimalCost)
+        
+        let diff = playerCost - optimalCost
+        if diff == 0
+          then putStrLn "Trabalho perfeito! Você fez a ferrovia mais rápida possível!"
+        
+        else putStrLn ("Viagens custam " ++ show diff ++ " a mais que o melhor trajeto possível.")
+
 -- loop que executa o jogo interativamente com o jogador
-gameLoop :: Map -> Cords -> Cords -> Int -> IO ()
-gameLoop mp currentTile secondCity budget = do
+gameLoop :: Map -> Cords -> Cords -> Int -> [Cords] -> Cords -> IO ()
+gameLoop mp currentTile secondCity budget path firstCity = do
   let available = getAvailableBuilds currentTile mp
+  let affordable = filter (\c -> buildingCost (getElement c mp) <= budget) available
   
   -- verifica casos de derrota
   if null available then do
     printMap mp []
     putStrLn "Você perdeu! Não existem painéis livres."
+
+  else if null affordable then do
+    printMap mp []
+    putStrLn "Você perdeu! Orçamento insuficiente."
 
   else if budget <= 0 then do
     printMap mp []
@@ -124,28 +147,31 @@ gameLoop mp currentTile secondCity budget = do
 
               -- analisa orçamento 
               if currentBudget < 0 then do 
-                putStrLn $ "Não é possível construir aqui. Você tem: $" ++ show budget ++ ". Necessário: $" ++ show cost
-                gameLoop mp currentTile secondCity budget
+                putStrLn ("Não é possível construir aqui. Você tem: $" ++ show budget ++ ". Necessário: $" ++ show cost)
+                gameLoop mp currentTile secondCity budget path firstCity
 
               -- construir e verificar se chegou ao fim
               else do
                 let newMap = buildOnMap cords mp
-                putStrLn $ "Construído em: " ++ show cords ++ "! (Orçamento restante: $" ++ show currentBudget ++ " )"
+                let newPath = path ++ [cords]
+                putStrLn ("Construído em: " ++ show cords ++ "! (Orçamento restante: $" ++ show currentBudget ++ " )")
 
                 if (arrivedAt cords secondCity mp) then do
                   printMap newMap []
                   putStrLn "Cidades conectadas!"
+                  let finalPath = newPath ++ [secondCity]
+                  evaluatePath finalPath mp firstCity secondCity
                 else 
-                    gameLoop newMap cords secondCity currentBudget
+                    gameLoop newMap cords secondCity currentBudget newPath firstCity
 
           -- processa entradas invalidas      
           else do
             putStrLn "Escolha um painel vizinho ao último construído!"
-            gameLoop mp currentTile secondCity budget
+            gameLoop mp currentTile secondCity budget path firstCity
           
           Nothing -> do
             putStrLn "Comando inválido! Tente novamente."
-            gameLoop mp currentTile secondCity budget
+            gameLoop mp currentTile secondCity budget path firstCity
 
 -- main
 main :: IO ()
@@ -156,5 +182,5 @@ main = do
   let initialMap = createMap mapSize (startLat, endLat)
   let firstCity = (startLat, 0)
   let secondCity = (endLat, 10)
-  let initialBudget = 15
-  gameLoop initialMap firstCity secondCity initialBudget
+  let initialBudget = 10000
+  gameLoop initialMap firstCity secondCity initialBudget [firstCity] firstCity
