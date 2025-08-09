@@ -1,8 +1,8 @@
 module Game where
 
-import Types
-import Graph
-import MapUtils
+import Utils.Types
+import Utils.Graph
+import Utils.MapUtils
 
 createMap :: Cords -> (Int, Int) -> Map
 createMap (maxLat, maxLong) (startLat, endLat) =
