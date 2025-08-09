@@ -1,4 +1,4 @@
-module Game where
+module Src.Game where
 
 import Utils.Types
 import Utils.Graph
@@ -182,5 +182,5 @@ main = do
   let initialMap = createMap mapSize (startLat, endLat)
   let firstCity = (startLat, 0)
   let secondCity = (endLat, 10)
-  let initialBudget = 10000
+  let initialBudget = 20
   gameLoop initialMap firstCity secondCity initialBudget [firstCity] firstCity

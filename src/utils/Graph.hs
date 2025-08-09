@@ -1,8 +1,8 @@
 module Utils.Graph where
 
 -- importa coisas necessarias de types e game
-import Types (Cords, Map, Tile(..))
-import MapUtils
+import Utils.Types (Cords, Map, Tile(..))
+import Utils.MapUtils
 
 type Node = Cords
 type Weight = Int
