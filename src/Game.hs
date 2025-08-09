@@ -4,6 +4,7 @@ import Utils.Types
 import Utils.Graph
 import Utils.MapUtils
 
+-- gera o mapa do jogo
 createMap :: Cords -> (Int, Int) -> Map
 createMap (maxLat, maxLong) (startLat, endLat) =
   let baseMap = [[tile lat long | long <- [0..maxLong-1]] | lat <- [0..maxLat-1]]
