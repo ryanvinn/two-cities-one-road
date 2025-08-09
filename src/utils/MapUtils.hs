@@ -1,4 +1,4 @@
-module MapUtils where
+module Utils.MapUtils where
 
 import Types
 
