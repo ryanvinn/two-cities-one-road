@@ -18,11 +18,14 @@ homeScreen = baseScreen
 -- | Retorna uma String representativa da tela de jogo
 -- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
 -- (com os valores da matriz 5x11 e os valores dos recursos)
-gameScreen :: String
-gameScreen = baseScreen
-  (leftJustifyLine getGameHeader)
-  (middleJustifyColumn getGameMatrix)
-  (middleJustifyLine "W: cima, A: esquerda, D: direita, S: baixo, Q: sair")
+gameScreen :: IO String
+gameScreen = do
+  header <- getGameHeader
+  matrix <- getGameMatrix
+  let topPart = leftJustifyLine header
+      middlePart = middleJustifyColumn matrix
+      bottomPart = middleJustifyLine "W: cima, A: esquerda, D: direita, S: baixo, Q: sair"
+  return $ baseScreen topPart middlePart bottomPart
 
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
 -- formatada

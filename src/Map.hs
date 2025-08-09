@@ -1,7 +1,6 @@
 module Map where
 
 import System.Random (randomRIO)
-import System.IO.Unsafe
 
 import Persistence (writeString, readString, writeInt, readInt)
 
@@ -15,12 +14,12 @@ generateRandomMap = do
   writeString matrix_loc new_matrix
 
 -- | Retorna informações de cabeçalho do mapa salvo
-getGameHeader :: String
-getGameHeader = unsafePerformIO (readString header_loc)
+getGameHeader :: IO String
+getGameHeader = readString header_loc
 
 -- | Retorna informações de matriz do mapa salvo
-getGameMatrix :: [String]
-getGameMatrix = unsafePerformIO (fmap sliceString (readString matrix_loc))
+getGameMatrix :: IO [String]
+getGameMatrix = fmap sliceString (readString matrix_loc)
 
 -- | Gera e retorna um mapa aleatório
 getRandomMatrix :: IO String

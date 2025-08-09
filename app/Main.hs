@@ -30,7 +30,8 @@ runHomeScreen = do
 runGameScreen :: IO ()
 runGameScreen = do
   clearScreen
-  putStr gameScreen
+  screen <- gameScreen
+  putStr screen
   key <- getKey
   case key of
     'q' -> runHomeScreen
