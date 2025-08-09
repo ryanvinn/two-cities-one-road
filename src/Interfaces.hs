@@ -2,6 +2,7 @@ module Interfaces where
 
 import Data.List (intercalate, transpose) -- Para intercalar dados na formatação
 import Map (getGameHeader, getGameMatrix)
+import Colors
 
 -- | Retorna uma String representativa da tela inicial
 homeScreen :: String
@@ -115,34 +116,44 @@ line_length = 55
 
 -- | Mapeia o padrão de caracteres de cada elemento
 grids :: Char -> [String]
-grids 'p' = [".,..,",
+grids 'p' = map green [
+             ".,..,",
              ",,..,",
              ".,..."]
-grids 'P' = [".,..,",
+grids 'P' = map green [
+             ".,..,",
              "═════",
              ".,..."]
-grids 'm' = ["..^.^",
+grids 'm' = map brown [
+             "..^.^",
              "^^.^^",
              ".^.^."]
-grids 'M' = ["..^.^",
+grids 'M' = map brown [
+             "..^.^",
              "═════",
              ".^.^."]
-grids 'l' = [".◡♣◡,",
+grids 'l' = map blue [
+             ".◡♣◡,",
              "◡◡◡◡,",
-             "◡◡.♣"]
-grids 'L' = [".◡♣◡,",
+             "◡◡◡.♣"]
+grids 'L' = map blue [
+             ".◡♣◡,",
              "═════",
              "◡◡.♣"]
-grids 'f' = ["♣,♣♣,",
+grids 'f' = map darkGreen [
+             "♣,♣♣,",
              "♣.♣♣♣",
              ".♣♣,♣"]
-grids 'F' = ["♣,♣♣,",
+grids 'F' = map darkGreen [
+             "♣,♣♣,",
              "═════",
              ".♣♣,♣"]
-grids 'c' = ["☵,♣☵,",
+grids 'c' = map white [
+             "☵,♣☵,",
              ",☵☵☵.",
              ".☵♣,☵"]
-grids 'C' = ["☵♣☵☵,",
+grids 'C' = map white [
+             "☵♣☵☵,",
              "☵☵═══",
              "☵☵♣,☵"]
 grids _   = ["SOCOR",

@@ -70,7 +70,7 @@ executable two-cities-one-road
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: Map Persistence
+    other-modules: Map Persistence Interfaces Colors
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -79,7 +79,8 @@ executable two-cities-one-road
     build-depends:    base ^>=4.18.2.1,
                       haskeline >=0.8.2 && <0.9,
                       random >=1.2 && <1.3,
-                      directory ^>=1.3.7.0
+                      directory ^>=1.3.7.0,
+                      ansi-terminal
 
     -- Directories containing source files.
     hs-source-dirs:   app, src
