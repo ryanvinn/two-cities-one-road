@@ -11,13 +11,9 @@ homeScreen = baseScreen
     "Bem vindo ao jogo!",
     "",
     "Seu objetivo é conectar duas cidades com recursos",
-    "limitados e diversos obstáculos e materiais.",
-    "",
-    "(A) Acessar último mapa",
-    "(G) Gerar novo mapa",
-    "(Q) Encerrar programa"
+    "limitados e diversos obstáculos e materiais."
   ])
-  (middleJustifyLine "<Aperte a tecla correspondente à uma das opções>")
+  (middleJustifyLine "A: acessar último mapa, G: gerar mapa, Q: sair")
 
 -- | Retorna uma String representativa da tela de jogo
 -- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
@@ -26,7 +22,7 @@ gameScreen :: String
 gameScreen = baseScreen
   (leftJustifyLine getGameHeader)
   (middleJustifyColumn getGameMatrix)
-  (emptyLine) -- TODO exibir comandos possíveis
+  (middleJustifyLine "W: cima, A: esquerda, D: direita, S: baixo, Q: sair")
 
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
 -- formatada

@@ -1,6 +1,7 @@
 module Map where
 
 import System.Random (randomRIO)
+import System.IO.Unsafe
 
 import Persistence (writeString, readString, writeInt, readInt)
 
@@ -10,25 +11,21 @@ generateRandomMap = do
   new_matrix <- getRandomMatrix
   new_header <- getRandomHeader
 
-  writeString "data/matrix.txt" new_matrix
-  writeString "data/header.txt" new_header
+  writeString header_loc new_header
+  writeString matrix_loc new_matrix
 
--- | Retorna informações dos mapas salvos em memória
-getSavedMapsInfos :: [String]
-getSavedMapsInfos = [""] -- TODO
-
--- | Retorna informações de cabeçalho do mapa em questão
+-- | Retorna informações de cabeçalho do mapa salvo
 getGameHeader :: String
-getGameHeader = "" -- TODO
+getGameHeader = unsafePerformIO (readString header_loc)
 
--- | Retorna informações de matriz do mapa em questão
+-- | Retorna informações de matriz do mapa salvo
 getGameMatrix :: [String]
-getGameMatrix = [""] -- TODO
+getGameMatrix = unsafePerformIO (fmap sliceString (readString matrix_loc))
 
 -- | Gera e retorna um mapa aleatório
 getRandomMatrix :: IO String
 getRandomMatrix = do
-  middle <- sequence (replicate (11*5 - 2) (randomChar alphabet))
+  middle <- sequence (replicate (lin*col - 2) (randomChar alphabet))
   return ("C" ++ middle ++ "C")
   where
     randomChar chars = do
@@ -39,5 +36,32 @@ getRandomMatrix = do
 -- | Gera e retorna um cabeçalho aleatório
 getRandomHeader :: IO String
 getRandomHeader = do
-  randomNum <- randomRIO (50, 150) :: IO Int
+  randomNum <- randomRIO (cash_min, cash_max) :: IO Int
   return (show randomNum)
+
+sliceString :: String -> [String]
+sliceString s = [take 11 (drop (i * 11) s) | i <- [0..4]]
+
+-- | Localização do cabeçalho do mapa na memória
+header_loc :: String
+header_loc = "data/header.txt"
+
+-- | Localização da matriz do mapa na memória
+matrix_loc :: String
+matrix_loc = "data/matrix.txt"
+
+-- | Número mínimo de dinheiro para iniciar uma partida
+cash_min :: Int
+cash_min = 50
+
+-- | Número máximo de dinheiro para iniciar uma partida
+cash_max :: Int
+cash_max = 150
+
+-- Número de colunas
+col :: Int
+col = 5
+
+-- Número de linhas
+lin :: Int
+lin = 11

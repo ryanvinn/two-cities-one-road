@@ -7,13 +7,13 @@ import Interfaces (homeScreen, gameScreen)
 import Map (generateRandomMap)
 
 -- | Função principal do programa
-main :: IO()
+main :: IO ()
 main = do
   verifyAndCreateFiles
   runHomeScreen
 
 -- Executa a tela inicial
-runHomeScreen :: IO()
+runHomeScreen :: IO ()
 runHomeScreen = do
   clearScreen
   putStr homeScreen
@@ -30,11 +30,14 @@ runHomeScreen = do
 runGameScreen :: IO ()
 runGameScreen = do
   clearScreen
-  -- TODO interface com lógica do jogo
   putStr gameScreen
   key <- getKey
   case key of
     'q' -> runHomeScreen
+    'w' -> runGameScreen -- TODO
+    'a' -> runGameScreen -- TODO
+    's' -> runGameScreen -- TODO
+    'd' -> runGameScreen -- TODO
     _ -> runGameScreen
 
 -- | Limpa a tela
