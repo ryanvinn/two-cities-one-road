@@ -25,9 +25,10 @@ gameScreen :: IO String
 gameScreen = do
   header <- getGameHeader
   matrix <- getGameMatrix
-  let topPart = leftJustifyLine header
-      middlePart = middleJustifyColumn matrix
-      bottomPart = middleJustifyLine "W: cima, A: esquerda, D: direita, S: baixo, Q: sair"
+  let expanded_matrix = expandMatrix matrix
+      topPart = leftJustifyLine header
+      middlePart = middleJustifyColumn expanded_matrix
+      bottomPart = middleJustifyLine "W-A-S-D: construir caminhos, Q: sair"
   return $ baseScreen topPart middlePart bottomPart
 
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
@@ -42,6 +43,13 @@ baseScreen top middle down = unlines [
     ("│" ++ down ++ "│"),
     ("╰" ++ simpleLine ++ "╯")
   ]
+
+-- | Expande a matriz original
+expandMatrix :: [String] -> [String]
+expandMatrix = concatMap expandLine
+  where
+    expandLine :: String -> [String]
+    expandLine line = replicate 3 (concatMap (replicate 5) line)
 
 -- | Retorna um linha de 55 caracteres '─'
 simpleLine :: String

@@ -30,7 +30,6 @@ getRandomMatrix = do
     randomChar chars = do
       i <- randomRIO (0, length chars - 1)
       return (chars !! i)
-    alphabet = "PPPPMML"
 
 -- | Gera e retorna um cabeçalho aleatório
 getRandomHeader :: IO String
@@ -40,6 +39,10 @@ getRandomHeader = do
 
 sliceString :: String -> [String]
 sliceString s = [take 11 (drop (i * 11) s) | i <- [0..4]]
+
+-- Alfabeto de porcentagens
+alphabet :: String
+alphabet = "pppPmMl"
 
 -- | Localização do cabeçalho do mapa na memória
 header_loc :: String
