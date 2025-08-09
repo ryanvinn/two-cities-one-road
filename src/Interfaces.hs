@@ -26,7 +26,7 @@ gameScreen = do
   header <- getGameHeader
   matrix <- getGameMatrix
   let expanded_matrix = expandMatrix matrix
-      topPart = leftJustifyLine header
+      topPart = middleJustifyLine ("Dinheiro restante: " ++ header)
       middlePart = middleJustifyColumn expanded_matrix
       bottomPart = middleJustifyLine "W-A-S-D: construir caminhos, Q: sair"
   return $ baseScreen topPart middlePart bottomPart
