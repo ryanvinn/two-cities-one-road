@@ -1,8 +1,8 @@
-module Src.Game where
+module Game where
 
-import Utils.Types
-import Utils.Graph
-import Utils.MapUtils
+import Types
+import Graph
+import MapUtils
 
 -- gera o mapa do jogo
 createMap :: Cords -> (Int, Int) -> Map

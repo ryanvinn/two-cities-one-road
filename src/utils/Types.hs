@@ -1,4 +1,4 @@
-module Utils.Types where
+module Types where
 
 -- terreno do jogo
 data Terrain = Plains | River | Mountain deriving (Eq, Show)

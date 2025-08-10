@@ -1,6 +1,6 @@
-module Utils.MapUtils where
+module MapUtils where
 
-import Utils.Types
+import Types
 
 -- pega um tile a partir das coordenadas
 getElement :: Cords -> Map -> Tile
