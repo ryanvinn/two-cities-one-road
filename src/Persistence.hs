@@ -12,13 +12,16 @@ verifyAndCreateFiles = do
 
   exists1 <- doesFileExist file1
   exists2 <- doesFileExist file2
+  exists3 <- doesFileExist file3
 
   unless exists1 (writeFile file1 default_matrix)
-  unless exists2 (writeFile file2 default_header)
+  unless exists2 (writeFile file2 default_cash)
+  unless exists3 (writeFile file3 default_coord)
 
   where
     file1 = "data/matrix.txt"
-    file2 = "data/header.txt"
+    file2 = "data/cash.txt"
+    file3 = "data/coord.txt"
 
 -- | Salva uma String em um arquivo
 writeString :: FilePath -> String -> IO ()
@@ -48,6 +51,10 @@ readInt path = do
 default_matrix :: String
 default_matrix = "CPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPc"
 
--- | Valor padrão do cabeçalho de um mapa
-default_header :: String
-default_header = "100"
+-- | Valor padrão de dinheiro inicial de um jogador
+default_cash :: String
+default_cash = "100"
+
+-- | Valor padrão de coordenada inicial de um jogador
+default_coord :: String
+default_coord = "00"

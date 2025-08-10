@@ -8,18 +8,23 @@ import Persistence (writeString, readString, writeInt, readInt)
 generateRandomMap :: IO ()
 generateRandomMap = do
   new_matrix <- getRandomMatrix
-  new_header <- getRandomHeader
+  new_cash <- getRandomCash
 
-  writeString header_loc new_header
+  writeString cash_loc new_cash
   writeString matrix_loc new_matrix
+  writeString coord_loc coord_default
 
--- | Retorna informações de cabeçalho do mapa salvo
-getGameHeader :: IO String
-getGameHeader = readString header_loc
+-- | Retorna informações de dinheiro do jogador do mapa salvo
+getPlayerCash :: IO String
+getPlayerCash = readString cash_loc
+
+-- | Retorna informações de localização do jogador do mapa salvo
+getPlayerCoord :: IO String
+getPlayerCoord = readString coord_loc
 
 -- | Retorna informações de matriz do mapa salvo
-getGameMatrix :: IO [String]
-getGameMatrix = fmap sliceString (readString matrix_loc)
+getMapMatrix :: IO [String]
+getMapMatrix = fmap sliceString (readString matrix_loc)
 
 -- | Gera e retorna um mapa aleatório
 getRandomMatrix :: IO String
@@ -31,12 +36,13 @@ getRandomMatrix = do
       i <- randomRIO (0, length chars - 1)
       return (chars !! i)
 
--- | Gera e retorna um cabeçalho aleatório
-getRandomHeader :: IO String
-getRandomHeader = do
+-- | Gera e retorna um valor aleatório de dinheiro para o jogador
+getRandomCash :: IO String
+getRandomCash = do
   randomNum <- randomRIO (cash_min, cash_max) :: IO Int
   return (show randomNum)
 
+-- | Corta uma String
 sliceString :: String -> [String]
 sliceString s = [take 11 (drop (i * 11) s) | i <- [0..4]]
 
@@ -44,9 +50,13 @@ sliceString s = [take 11 (drop (i * 11) s) | i <- [0..4]]
 alphabet :: String
 alphabet = "ppppPmmffl"
 
--- | Localização do cabeçalho do mapa na memória
-header_loc :: String
-header_loc = "data/header.txt"
+-- | Localização do estado de dinheiro do jogador na memória
+cash_loc :: String
+cash_loc = "data/cash.txt"
+
+-- | Localização do estado de localização do jogador na memória
+coord_loc :: String
+coord_loc = "data/coord.txt"
 
 -- | Localização da matriz do mapa na memória
 matrix_loc :: String
@@ -59,6 +69,10 @@ cash_min = 50
 -- | Número máximo de dinheiro para iniciar uma partida
 cash_max :: Int
 cash_max = 150
+
+-- |
+coord_default :: String
+coord_default = "00"
 
 -- Número de colunas
 col :: Int

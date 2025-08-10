@@ -3,19 +3,11 @@ module Game where
 import Types
 import Graph
 import MapUtils
+import Persistence (writeString, readString, writeInt, readInt)
 
--- gera o mapa do jogo
-createMap :: Cords -> (Int, Int) -> Map
-createMap (maxLat, maxLong) (startLat, endLat) =
-  let baseMap = [[tile lat long | long <- [0..maxLong-1]] | lat <- [0..maxLat-1]]
-      firstCity = buildOnMap (startLat, 0) baseMap
-      secondCity = buildOnMap (endLat, maxLong - 1) firstCity
-  in secondCity
-  where 
-    tile lat long
-      | odd lat && even long = Tile Mountain 3 2 (lat, long) False
-      | mod long 3 == 0 = Tile River 2 2 (lat, long) False
-      | otherwise = Tile Plains 1 1 (lat, long) False
+-- | Recebe um comando de usuário (W-A-S-D) e atualiza o mapa
+getCommand :: Char -> IO ()
+getCommand key = putStr " " -- TODO
 
 -- processa informacoes do painel para exibir na tela
 printTile :: Tile -> [Cords] -> Char

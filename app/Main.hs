@@ -5,6 +5,7 @@ import System.Console.Haskeline -- Para capturar comandos de teclado
 import Persistence (verifyAndCreateFiles)
 import Interfaces (homeScreen, gameScreen)
 import Map (generateRandomMap)
+import Game (getCommand)
 
 -- | Função principal do programa
 main :: IO ()
@@ -35,10 +36,18 @@ runGameScreen = do
   key <- getKey
   case key of
     'q' -> runHomeScreen
-    'w' -> runGameScreen -- TODO
-    'a' -> runGameScreen -- TODO
-    's' -> runGameScreen -- TODO
-    'd' -> runGameScreen -- TODO
+    'w' -> do
+      getCommand 'w'
+      runGameScreen
+    'a' -> do
+      getCommand 'a'
+      runGameScreen
+    's' -> do
+      getCommand 's'
+      runGameScreen
+    'd' -> do
+      getCommand 'd'
+      runGameScreen
     _ -> runGameScreen
 
 -- | Limpa a tela
