@@ -3,9 +3,10 @@ module Game where
 import Types
 import Graph
 import MapUtils
-import Persistence (writeString, readString, writeInt, readInt)
+import Map (getPlayerCash, getPlayerCoord, getMapMatrix)
+import Map (setPlayerCash, setPlayerCoord, setMapMatrix)
 
--- | Recebe um comando de usuário (W-A-S-D) e atualiza o mapa
+-- | Recebe um comando de usuário (W-A-S-D) e atualiza o estado do jogo
 getCommand :: Char -> IO ()
 getCommand key = putStr " " -- TODO
 
@@ -164,15 +165,3 @@ gameLoop mp currentTile secondCity budget path firstCity = do
           Nothing -> do
             putStrLn "Comando inválido! Tente novamente."
             gameLoop mp currentTile secondCity budget path firstCity
-
--- main
-main :: IO ()
-main = do
-  let mapSize = (5, 11)
-  let startLat = 2
-  let endLat = 4
-  let initialMap = createMap mapSize (startLat, endLat)
-  let firstCity = (startLat, 0)
-  let secondCity = (endLat, 10)
-  let initialBudget = 20
-  gameLoop initialMap firstCity secondCity initialBudget [firstCity] firstCity

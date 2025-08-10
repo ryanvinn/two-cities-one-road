@@ -26,6 +26,18 @@ getPlayerCoord = readString coord_loc
 getMapMatrix :: IO [String]
 getMapMatrix = fmap sliceString (readString matrix_loc)
 
+-- | ALtera informações de dinheiro do jogador do mapa salvo
+setPlayerCash :: String -> IO ()
+setPlayerCash str = writeString cash_loc str
+
+-- | Altera informações de localização do jogador do mapa salvo
+setPlayerCoord :: String -> IO ()
+setPlayerCoord str = writeString coord_loc str
+
+-- | Altera informações de matriz do mapa salvo
+setMapMatrix :: [String] -> IO ()
+setMapMatrix strs = writeString matrix_loc strs
+
 -- | Gera e retorna um mapa aleatório
 getRandomMatrix :: IO String
 getRandomMatrix = do
