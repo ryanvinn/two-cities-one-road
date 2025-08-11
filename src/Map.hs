@@ -36,7 +36,7 @@ setPlayerCoord str = writeString coord_loc str
 
 -- | Altera informações de matriz do mapa salvo
 setMapMatrix :: [String] -> IO ()
-setMapMatrix strs = writeString matrix_loc strs
+setMapMatrix strs = writeString matrix_loc (unlines strs)
 
 -- | Gera e retorna um mapa aleatório
 getRandomMatrix :: IO String

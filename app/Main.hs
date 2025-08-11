@@ -1,11 +1,10 @@
 module Main where
 
-import System.Console.Haskeline -- Para capturar comandos de teclado
-
 import Persistence (verifyAndCreateFiles)
 import Interfaces (homeScreen, gameScreen)
 import Map (generateRandomMap)
-import Game (getCommand)
+import Game (gameLoop)
+import IOUtils (getKey, clearScreen)
 
 -- | Função principal do programa
 main :: IO ()
@@ -36,28 +35,15 @@ runGameScreen = do
   key <- getKey
   case key of
     'q' -> runHomeScreen
-    'w' -> do
-      getCommand 'w'
-      runGameScreen
-    'a' -> do
-      getCommand 'a'
-      runGameScreen
-    's' -> do
-      getCommand 's'
-      runGameScreen
-    'd' -> do
-      getCommand 'd'
-      runGameScreen
+    'w' -> handleMovement 'w'
+    'a' -> handleMovement 'a'
+    's' -> handleMovement 's'
+    'd' -> handleMovement 'd'
     _ -> runGameScreen
 
--- | Limpa a tela
-clearScreen :: IO ()
-clearScreen = putStr "\ESC[2J\ESC[H"
-
--- Retorna em Char a tecla pressionada
-getKey :: IO Char
-getKey = do
-  result <- runInputT defaultSettings (getInputChar "")
-  case result of
-    Just c -> return c
-    Nothing -> return '\0'
+handleMovement :: Char -> IO ()
+handleMovement direction = do
+  out <- gameLoop direction
+  if out == 0
+    then runHomeScreen
+    else runGameScreen

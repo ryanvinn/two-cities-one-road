@@ -6,17 +6,15 @@ import MapUtils
 import Map (getPlayerCash, getPlayerCoord, getMapMatrix)
 import Map (setPlayerCash, setPlayerCoord, setMapMatrix)
 
--- | Recebe um comando de usuário (W-A-S-D) e atualiza o estado do jogo
-getCommand :: Char -> IO ()
-getCommand key =
-
--- loop que executa o jogo interativamente com o jogador
-gameLoop :: Char -> IO ()
+-- Loop de execução do jogo
+gameLoop :: Char -> IO Int
 gameLoop key = do
-  let available = getAvailableBuilds (
-    (convertPlayerCoord getPlayerCoord)
-    (convertMapMatrix getMapMatrix)
-  )
+  coordStr <- getPlayerCoord
+  let player_coord = StringToCoord coordStr
+  let next_coord = charToNextCoord key player_coord
+  let map_matrix = stringToMap getMapMatrix
+
+  let available = getAvailableBuilds player_coord map_matrix
   let affordable = filter (\c -> buildingCost (getElement c mp) <= budget) available
   
   -- verifica casos de derrota
@@ -76,16 +74,8 @@ gameLoop key = do
             putStrLn "Comando inválido! Tente novamente."
             gameLoop mp currentTile secondCity budget path firstCity
 
--- |
-convertPlayerCoord :: String -> Cords
-convertPlayerCoord str = (0, 0) -- TODO
-
--- |
-convertMapMatrix :: [String] -> Map
-convertMapMatrix strs =  -- TODO
-
 -- processa informacoes do painel para exibir na tela
-printTile :: Tile -> [Cords] -> Char
+printTile :: Tile -> [Coord] -> Char
 printTile tile available
   | built tile = 'O'
   | location tile `elem` available = '*'
@@ -95,38 +85,38 @@ printTile tile available
       Mountain -> '^'
 
 -- printMap: mapeia a funcao printTile em todas as listas internas da matriz, e chama recursivamente para o restante
-printMap :: Map -> [Cords] -> IO ()
+printMap :: Map -> [Coord] -> IO ()
 printMap [] _ = print "##########"
 printMap (col:cols) available = do
   putStrLn (map (\tile -> printTile tile available) col)
   printMap cols available
 
 -- funcao build retorna o mesmo tile, so que com atributo de construido
-buildTile :: Cords -> Map -> Tile
+buildTile :: Coord -> Map -> Tile
 buildTile cords mp = newTile 
   where
     newTile = Tile (terrain current) (buildingCost current) (passingCost current) (location current) True 
       where current = getElement cords mp
 
 -- atualiza o mapa quando algum tile for construido
-buildOnMap :: Cords -> Map -> Map
+buildOnMap :: Coord -> Map -> Map
 buildOnMap (lat, long) mp =
   let row = mp !! lat
       newRow = take long row ++ [buildTile (lat, long) mp] ++ drop (long + 1) row
   in take lat mp ++ [newRow] ++ drop (lat + 1) mp
 
 -- verifica se um painel esta disponivel, ou ja foi construido
-canBuild :: Cords -> Map -> Bool
+canBuild :: Coord -> Map -> Bool
 canBuild cords mp = 
   verifyCord cords mp && not (built (getElement cords mp))
 
 -- aplica o filtro de canBuild na lista de vizinhos de um painel
-getAvailableBuilds :: Cords -> Map -> [Cords]
+getAvailableBuilds :: Coord -> Map -> [Coord]
 getAvailableBuilds cords mp = 
   filter (\c -> canBuild c mp) (findNeighbors cords mp)
 
 -- verifica se chegou ao painel destino
-arrivedAt :: Cords -> Cords -> Map -> Bool
+arrivedAt :: Coord -> Coord -> Map -> Bool
 arrivedAt current endCity mp = endCity `elem` (findNeighbors current mp)
 
 -- funcao auxiliar para evitar erros ao ler inteiros da do jogador
@@ -136,7 +126,7 @@ readInputInt s = case reads s of
   _-> Nothing
 
 -- le e interpreta a entrada do usuario em coordenadas
-readPlayer :: String -> Maybe Cords
+readPlayer :: String -> Maybe Coord
 readPlayer input =
   case words input of
     [a, b] -> case (readInputInt a, readInputInt b) of
@@ -144,12 +134,12 @@ readPlayer input =
       _-> Nothing
     _-> Nothing
 
-getNodes :: Map -> [Cords]
+getNodes :: Map -> [Coord]
 getNodes mp = map location (concat mp)
 
 -- funcoes de IO().
 -- funcao que avalia o custo do trajeto do jogador
-evaluatePath :: [Cords] -> Map -> Cords -> Cords -> IO()
+evaluatePath :: [Coord] -> Map -> Coord -> Coord -> IO()
 evaluatePath playerPath mp start end = do
   let startCost = passingCost (getElement start mp)
   let endCost = passingCost (getElement end mp)
