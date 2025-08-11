@@ -8,7 +8,81 @@ import Map (setPlayerCash, setPlayerCoord, setMapMatrix)
 
 -- | Recebe um comando de usuário (W-A-S-D) e atualiza o estado do jogo
 getCommand :: Char -> IO ()
-getCommand key = putStr " " -- TODO
+getCommand key =
+
+-- loop que executa o jogo interativamente com o jogador
+gameLoop :: Char -> IO ()
+gameLoop key = do
+  let available = getAvailableBuilds (
+    (convertPlayerCoord getPlayerCoord)
+    (convertMapMatrix getMapMatrix)
+  )
+  let affordable = filter (\c -> buildingCost (getElement c mp) <= budget) available
+  
+  -- verifica casos de derrota
+  if null available then do
+    printMap mp []
+    putStrLn "Você perdeu! Não existem painéis livres."
+
+  else if null affordable then do
+    printMap mp []
+    putStrLn "Você perdeu! Orçamento insuficiente."
+
+  else if budget <= 0 then do
+    printMap mp []
+    putStrLn "Você perdeu! Seu orçamento acabou."
+
+    else do
+      printMap mp available
+      putStrLn "Escolha LINHA e COLUNA do painel possível que você quer construir (ex: 1 1) ou digite 'q' para sair."
+      input <- getLine
+
+      -- processamento da entrada
+      case input of
+        "q" -> putStrLn "Jogo interrompido."
+
+        _ -> case readPlayer input of
+          Just cords ->
+            if cords `elem` available then do
+              let tile = (getElement cords mp) 
+              let cost = buildingCost tile
+              let currentBudget = budget - cost
+
+              -- analisa orçamento 
+              if currentBudget < 0 then do 
+                putStrLn ("Não é possível construir aqui. Você tem: $" ++ show budget ++ ". Necessário: $" ++ show cost)
+                gameLoop mp currentTile secondCity budget path firstCity
+
+              -- construir e verificar se chegou ao fim
+              else do
+                let newMap = buildOnMap cords mp
+                let newPath = path ++ [cords]
+                putStrLn ("Construído em: " ++ show cords ++ "! (Orçamento restante: $" ++ show currentBudget ++ " )")
+
+                if (arrivedAt cords secondCity mp) then do
+                  printMap newMap []
+                  putStrLn "Cidades conectadas!"
+                  let finalPath = newPath ++ [secondCity]
+                  evaluatePath finalPath mp firstCity secondCity
+                else 
+                    gameLoop newMap cords secondCity currentBudget newPath firstCity
+
+          -- processa entradas invalidas      
+          else do
+            putStrLn "Escolha um painel vizinho ao último construído!"
+            gameLoop mp currentTile secondCity budget path firstCity
+          
+          Nothing -> do
+            putStrLn "Comando inválido! Tente novamente."
+            gameLoop mp currentTile secondCity budget path firstCity
+
+-- |
+convertPlayerCoord :: String -> Cords
+convertPlayerCoord str = (0, 0) -- TODO
+
+-- |
+convertMapMatrix :: [String] -> Map
+convertMapMatrix strs =  -- TODO
 
 -- processa informacoes do painel para exibir na tela
 printTile :: Tile -> [Cords] -> Char
@@ -102,66 +176,3 @@ evaluatePath playerPath mp start end = do
           then putStrLn "Trabalho perfeito! Você fez a ferrovia mais rápida possível!"
         
         else putStrLn ("Viagens custam " ++ show diff ++ " a mais que o melhor trajeto possível.")
-
--- loop que executa o jogo interativamente com o jogador
-gameLoop :: Map -> Cords -> Cords -> Int -> [Cords] -> Cords -> IO ()
-gameLoop mp currentTile secondCity budget path firstCity = do
-  let available = getAvailableBuilds currentTile mp
-  let affordable = filter (\c -> buildingCost (getElement c mp) <= budget) available
-  
-  -- verifica casos de derrota
-  if null available then do
-    printMap mp []
-    putStrLn "Você perdeu! Não existem painéis livres."
-
-  else if null affordable then do
-    printMap mp []
-    putStrLn "Você perdeu! Orçamento insuficiente."
-
-  else if budget <= 0 then do
-    printMap mp []
-    putStrLn "Você perdeu! Seu orçamento acabou."
-
-    else do
-      printMap mp available
-      putStrLn "Escolha LINHA e COLUNA do painel possível que você quer construir (ex: 1 1) ou digite 'q' para sair."
-      input <- getLine
-
-      -- processamento da entrada
-      case input of
-        "q" -> putStrLn "Jogo interrompido."
-
-        _ -> case readPlayer input of
-          Just cords ->
-            if cords `elem` available then do
-              let tile = (getElement cords mp) 
-              let cost = buildingCost tile
-              let currentBudget = budget - cost
-
-              -- analisa orçamento 
-              if currentBudget < 0 then do 
-                putStrLn ("Não é possível construir aqui. Você tem: $" ++ show budget ++ ". Necessário: $" ++ show cost)
-                gameLoop mp currentTile secondCity budget path firstCity
-
-              -- construir e verificar se chegou ao fim
-              else do
-                let newMap = buildOnMap cords mp
-                let newPath = path ++ [cords]
-                putStrLn ("Construído em: " ++ show cords ++ "! (Orçamento restante: $" ++ show currentBudget ++ " )")
-
-                if (arrivedAt cords secondCity mp) then do
-                  printMap newMap []
-                  putStrLn "Cidades conectadas!"
-                  let finalPath = newPath ++ [secondCity]
-                  evaluatePath finalPath mp firstCity secondCity
-                else 
-                    gameLoop newMap cords secondCity currentBudget newPath firstCity
-
-          -- processa entradas invalidas      
-          else do
-            putStrLn "Escolha um painel vizinho ao último construído!"
-            gameLoop mp currentTile secondCity budget path firstCity
-          
-          Nothing -> do
-            putStrLn "Comando inválido! Tente novamente."
-            gameLoop mp currentTile secondCity budget path firstCity
