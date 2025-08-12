@@ -36,6 +36,13 @@ gameScreen = do
       bottomPart = middleJustifyLine "W-A-S-D: construir caminhos | Q: sair"
   return $ baseScreen topPart middlePart bottomPart
 
+-- | Tela de fim de jogo
+endScreen :: String -> [String] -> String
+endScreen status infos = baseScreen
+  (middleJustifyLine status)
+  (topJustifyColumn infos)
+  (middleJustifyLine "Q: sair")
+
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
 -- formatada
 baseScreen :: String -> [String] -> String -> String

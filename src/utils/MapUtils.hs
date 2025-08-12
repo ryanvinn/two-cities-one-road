@@ -1,7 +1,7 @@
 module MapUtils where
 
 import Types
-import Data.Char (toUpper)
+import Data.Char (toUpper, ord, chr)
 import Map (getPlayerCoord)
 
 -- pega um tile a partir das coordenadas
@@ -35,11 +35,47 @@ charToNextCoord c (x, y) = case c of
 stringsToMap :: [String] -> Map
 stringsToMap strs =  map (map charToTile) (zipWith (\i -> zipWith (\j c -> (i,j,c)) [0..]) [0..] strs)
   where
-    charToTile (i,j,c) = case of
-      'p' -> Tile Plains 10 1 (i,j) False
+    charToTile (i,j,c) = case c of
+      'p' -> Tile Plain 10 1 (i,j) False
       'P' -> Tile C_Plain 10 1 (i,j) True
-      -- TODO
-      _ -> Tile Plains 10 1 (i,j) False
+      'l' -> Tile Lake 20 2 (i,j) False
+      'L' -> Tile C_Lake 20 2 (i,j) True
+      'm' -> Tile Mountain 30 3 (i,j) False
+      'M' -> Tile C_Mountain 30 3 (i,j) True
+      'f' -> Tile Forest 15 2 (i,j) False
+      'F' -> Tile C_Forest 15 2 (i,j) True
+      'c' -> Tile City 0 1 (i,j) False
+      'C' -> Tile C_City 0 1 (i,j) True
+      _ -> Tile Plain 10 1 (i,j) False
+
+-- | Converte Map em [String]
+mapToString :: Map -> [String]
+mapToString mp = map (map tileToChar) mp
+  where
+    tileToChar tile
+      | built tile = 'O'
+      | otherwise = case terrain tile of
+          Plain -> 'p'
+          C_Plain -> 'P'
+          Lake -> 'l'
+          C_Lake -> 'L'
+          Mountain -> 'm'
+          C_Mountain -> 'M'
+          Forest -> 'f'
+          C_Forest -> 'F'
+          City -> 'c'
+          C_City -> 'C'
+
+-- | Converte Coord em String
+coordToString :: Coord -> String
+coordToString (x, y) = [intToHexChar x, intToHexChar y]
+  where
+    intToHexChar :: Int -> Char
+    intToHexChar n
+      | n >= 0 && n <= 9 = chr (ord '0' + n)
+      | n >= 10 && n <= 15 = chr (ord 'A' + n - 10)
+      | otherwise = error "Coordinate value out of hex range (0-15)"
+
 
 -- Função para converter um caractere hexadecimal em um inteiro
 hexCharToInt :: Char -> Int

@@ -1,7 +1,7 @@
 module Main where
 
 import Persistence (verifyAndCreateFiles)
-import Interfaces (homeScreen, gameScreen)
+import Interfaces (homeScreen, gameScreen, endScreen)
 import Map (generateRandomMap)
 import Game (gameLoop)
 import IOUtils (getKey, clearScreen)
@@ -41,9 +41,22 @@ runGameScreen = do
     'd' -> handleMovement 'd'
     _ -> runGameScreen
 
+-- | Executa a tela de fim de jogo
+runEndScreen :: String -> [String] -> IO ()
+runEndScreen status info = do
+  clearScreen
+  let screen = endScreen status info
+  putStr screen
+  key <- getKey
+  case key of
+    'q' -> runHomeScreen
+    _ -> runEndScreen status info
+
+-- | Executa a lógica de jogo para cada direção ou encerra, quando acabar
 handleMovement :: Char -> IO ()
 handleMovement direction = do
-  out <- gameLoop direction
-  if out == 0
-    then runHomeScreen
-    else runGameScreen
+  (status, infos) <- gameLoop direction
+  case status of
+    'P' -> runEndScreen "Derrota" infos
+    'G' -> runEndScreen "Vitória" infos
+    'C' -> runGameScreen
