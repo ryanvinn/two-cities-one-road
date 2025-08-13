@@ -1,10 +1,10 @@
 module Main where
 
-import System.Console.Haskeline -- Para capturar comandos de teclado
-
 import Persistence (verifyAndCreateFiles)
-import Interfaces (homeScreen, gameScreen)
+import Interfaces (homeScreen, gameScreen, endScreen)
 import Map (generateRandomMap)
+import Game (gameLoop)
+import IOUtils (getKey, clearScreen)
 
 -- | Função principal do programa
 main :: IO ()
@@ -35,20 +35,28 @@ runGameScreen = do
   key <- getKey
   case key of
     'q' -> runHomeScreen
-    'w' -> runGameScreen -- TODO
-    'a' -> runGameScreen -- TODO
-    's' -> runGameScreen -- TODO
-    'd' -> runGameScreen -- TODO
+    'w' -> handleMovement 'w'
+    'a' -> handleMovement 'a'
+    's' -> handleMovement 's'
+    'd' -> handleMovement 'd'
     _ -> runGameScreen
 
--- | Limpa a tela
-clearScreen :: IO ()
-clearScreen = putStr "\ESC[2J\ESC[H"
+-- | Executa a tela de fim de jogo
+runEndScreen :: String -> [String] -> IO ()
+runEndScreen status info = do
+  clearScreen
+  let screen = endScreen status info
+  putStr screen
+  key <- getKey
+  case key of
+    'q' -> runHomeScreen
+    _ -> runEndScreen status info
 
--- Retorna em Char a tecla pressionada
-getKey :: IO Char
-getKey = do
-  result <- runInputT defaultSettings (getInputChar "")
-  case result of
-    Just c -> return c
-    Nothing -> return '\0'
+-- | Executa a lógica de jogo para cada direção ou encerra, quando acabar
+handleMovement :: Char -> IO ()
+handleMovement direction = do
+  (status, infos) <- gameLoop direction
+  case status of
+    'P' -> runEndScreen "Derrota" infos
+    'G' -> runEndScreen "Vitória" infos
+    'C' -> runGameScreen

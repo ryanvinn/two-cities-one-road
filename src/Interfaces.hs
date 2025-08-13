@@ -1,7 +1,7 @@
 module Interfaces where
 
 import Data.List (intercalate, transpose) -- Para intercalar dados na formatação
-import Map (getGameHeader, getGameMatrix)
+import Map (getPlayerCash, getMapMatrix, getPlayerCoord)
 import Colors
 
 -- | Retorna uma String representativa da tela inicial
@@ -17,20 +17,31 @@ homeScreen = baseScreen
     "Durante o jogo, use as teclas de direção (w, a, s, d)",
     "para construir trilhos nos quadrantes vizinhos ao seu."
   ])
-  (middleJustifyLine "A: acessar último mapa, G: gerar mapa, Q: sair")
+  (middleJustifyLine "A: acessar último mapa | G: gerar mapa | Q: sair")
 
 -- | Retorna uma String representativa da tela de jogo
 -- Para tanto, a partir do número do mapa, busca o arquivo recpectivo na memória
 -- (com os valores da matriz 5x11 e os valores dos recursos)
 gameScreen :: IO String
 gameScreen = do
-  header <- getGameHeader
-  matrix <- getGameMatrix
+  cash <- getPlayerCash
+  matrix <- getMapMatrix
+  coord <- getPlayerCoord
   let expanded_matrix = expandMatrix matrix
-      topPart = middleJustifyLine ("Dinheiro restante: " ++ header)
+      topPart = middleJustifyLine (
+          "Dinheiro restante: " ++ cash ++ " | " ++
+          "Posição do jogador: " ++ coord
+        )
       middlePart = middleJustifyColumn expanded_matrix
-      bottomPart = middleJustifyLine "W-A-S-D: construir caminhos, Q: sair"
+      bottomPart = middleJustifyLine "W-A-S-D: construir caminhos | Q: sair"
   return $ baseScreen topPart middlePart bottomPart
+
+-- | Tela de fim de jogo
+endScreen :: String -> [String] -> String
+endScreen status infos = baseScreen
+  (middleJustifyLine status)
+  (topJustifyColumn infos)
+  (middleJustifyLine "Q: sair")
 
 -- | Recebe os valores de cima, baixo e centro da tela e retorna a tela
 -- formatada

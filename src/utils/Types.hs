@@ -1,14 +1,19 @@
-module Utils.Types where
+module Types where
 
--- terreno do jogo
-data Terrain = Plains | River | Mountain deriving (Eq, Show)
+--  Terreno
+data Terrain = Plain | C_Plain 
+             | Lake | C_Lake 
+             | Mountain | C_Mountain 
+             | Forest | C_Forest 
+             | City | C_City 
+             deriving (Eq, Show)
 
--- alias de tupla para cords para facilitar codigo
-type Cords = (Int, Int)
+-- Coordenada
+type Coord = (Int, Int)
 
--- tipo composto painel
+-- Painel (contendo terreno, custo de construção, custo de passagem, localização, estado de construção)
 data Tile = Tile
-  { terrain :: Terrain, buildingCost :: Int, passingCost :: Int, location :: Cords, built :: Bool } deriving (Eq, Show)
+  { terrain :: Terrain, buildingCost :: Int, passingCost :: Int, location :: Coord, built :: Bool } deriving (Eq, Show)
 
--- alias de matriz para map para facilitar codigo
+-- Matriz de painéis
 type Map = [[Tile]]

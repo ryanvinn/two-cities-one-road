@@ -38,15 +38,11 @@ license-file:       LICENSE
 author:             ryanvinn,
                     arthur-vasco7,
                     fernandogentilp,
-                    eduardolacerdajr,
-                    Teones
 
 -- An email address to which users can send suggestions, bug reports, and patches.
 maintainer:         ryan.vinnicius.tielles.almeida.silva@ccc.ufcg.edu.br,
                     arthur.vasconcelos.rego.barros@ccc.ufcg.edu.br,
                     fernando.gentil.pinheiro.pacheco@ccc.ufcg.edu.br,
-                    eduardo.lacerda.junior@ccc.ufcg.edu.br,
-                    teones.alex.lira.farias.filho@ccc.ufcg.edu.br
 
 -- A copyright notice.
 -- copyright:
@@ -70,7 +66,7 @@ executable two-cities-one-road
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: Map Persistence Interfaces Colors
+    other-modules: Game Interfaces Map Persistence Colors Graph MapUtils Types IOUtils
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -83,7 +79,7 @@ executable two-cities-one-road
                       ansi-terminal
 
     -- Directories containing source files.
-    hs-source-dirs:   app, src
+    hs-source-dirs:   app, src, src/utils
 
     -- Base language which the package is written in.
     default-language: Haskell2010

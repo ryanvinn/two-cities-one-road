@@ -1,10 +1,10 @@
-module Utils.Graph where
+module Graph where
 
 -- importa coisas necessarias de types e game
-import Utils.Types (Cords, Map, Tile(..))
-import Utils.MapUtils
+import Types (Coord, Map, Tile(..))
+import MapUtils
 
-type Node = Cords
+type Node = Coord
 type Weight = Int
 type Edge = (Node, Node, Weight)
 type Graph = [Edge]
@@ -19,7 +19,7 @@ buildGraph mp = concatMap tileEdges allTiles
     tileEdges tile =
       let firstNode = location tile
           neighbors = findNeighbors firstNode mp
-      in [(firstNode, secondNode, passingCost (getElement secondNode mp)) | secondNode <- neighbors, verifyCord secondNode mp]
+      in [(firstNode, secondNode, passingCost (getElement secondNode mp)) | secondNode <- neighbors, verifyCoord secondNode mp]
 
 listNodes :: Map -> [Node]
 listNodes mp = map location (concat mp)
